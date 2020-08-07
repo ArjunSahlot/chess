@@ -236,9 +236,7 @@ class Piece:
         if self.name == "KNIGHT":
             for row in board:
                 for spot in row:
-                    if (abs(spot.get_pos()[0] - self.row) == 2 and abs(spot.get_pos()[1] - self.col) == 1) or (
-                            abs(spot.get_pos()[0] - self.row) == 1 and abs(
-                        spot.get_pos()[1] - self.col) == 2) and spot.get_color() != self.color:
+                    if (abs(spot.get_pos()[0] - self.row) == 2 and abs(spot.get_pos()[1] - self.col) == 1) or (abs(spot.get_pos()[0] - self.row) == 1 and abs(spot.get_pos()[1] - self.col) == 2) and spot.get_color() != self.color:
                         moves.append(spot.get_pos())
 
         # Pawns
@@ -305,29 +303,29 @@ def make_board():
         board.append([])
         for col in range(8):
             # Rooks
-            if (row == 0 and (col == 7 or col == 0)):
+            if row == 0 and (col == 7 or col == 0):
                 board[row].append(Piece(row, col, BROOK, "ROOK", "BLACK"))
-            elif (row == 7 and (col == 0 or col == 7)):
+            elif row == 7 and (col == 0 or col == 7):
                 board[row].append(Piece(row, col, WROOK, "ROOK", "WHITE"))
             # Knights
-            elif (row == 0 and (col == 6 or col == 1)):
+            elif row == 0 and (col == 6 or col == 1):
                 board[row].append(Piece(row, col, BKNIGHT, "KNIGHT", "BLACK"))
-            elif (row == 7 and (col == 1 or col == 6)):
+            elif row == 7 and (col == 1 or col == 6):
                 board[row].append(Piece(row, col, WKNIGHT, "KNIGHT", "WHITE"))
             # Bishops
-            elif (row == 0 and (col == 5 or col == 2)):
+            elif row == 0 and (col == 5 or col == 2):
                 board[row].append(Piece(row, col, BBISHOP, "BISHOP", "BLACK"))
-            elif (row == 7 and (col == 2 or col == 5)):
+            elif row == 7 and (col == 2 or col == 5):
                 board[row].append(Piece(row, col, WBISHOP, "BISHOP", "WHITE"))
             # Queens
-            elif (row == 0 and col == 3):
+            elif row == 0 and col == 3:
                 board[row].append(Piece(row, col, BQUEEN, "QUEEN", "BLACK"))
-            elif (row == 7 and col == 3):
+            elif row == 7 and col == 3:
                 board[row].append(Piece(row, col, WQUEEN, "QUEEN", "WHITE"))
             # Kings
-            elif (row == 0 and col == 4):
+            elif row == 0 and col == 4:
                 board[row].append(Piece(row, col, BKING, "KING", "BLACK"))
-            elif (row == 7 and col == 4):
+            elif row == 7 and col == 4:
                 board[row].append(Piece(row, col, WKING, "KING", "WHITE"))
             # Pawns
             elif row == 1:
@@ -430,6 +428,7 @@ def draw_window(window, board, cells):
 def main(window):
     board = make_board()
     cells = make_cells()
+    moving = False
     run = True
     flipped = False
     turn = "WHITE"
@@ -441,8 +440,10 @@ def main(window):
 
             mouseRow, mouseCol = xy_to_rowcol(pygame.mouse.get_pos())
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and not moving:
                 cells[mouseRow][mouseCol].select(cells)
+                if board[mouseRow][mouseCol].name != "nothing":
+                    moving = True
 
             for row in range(8):
                 for col in range(8):
@@ -451,11 +452,11 @@ def main(window):
                     if cell.selected and turn == piece.get_color():
                         piece.draw_moves(window, refine_moves(
                             board, piece.possible_moves(board, flipped), piece, flipped))
-                        if event.type == pygame.MOUSEBUTTONDOWN:
+                        if event.type == pygame.MOUSEBUTTONDOWN and moving:
+                            moving = False
                             mouseRow, mouseCol = xy_to_rowcol(
                                 pygame.mouse.get_pos())
-                            selecting_moves = False
-                            if (mouseRow, mouseCol) in piece.possible_moves(board):
+                            if (mouseRow, mouseCol) in refine_moves(board, piece.possible_moves(board, flipped), piece, flipped):
                                 board[mouseRow][mouseCol] = piece
                                 board[row][col] = Piece(
                                     row, col, "nothing", "nothing", "nothing")
