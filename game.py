@@ -256,7 +256,7 @@ class Piece:
                         if self.color == board[row][self.col].get_opposite_color():
                             break
                 else:
-                    if self.color != board[self.row + 1][self.col].get_color():
+                    if self.color == board[self.row + 1][self.col].name == "nothing"():
                         moves.append((self.row + 1, self.col))
             else:
                 if self.col != 0:
@@ -273,7 +273,7 @@ class Piece:
                         if self.color == board[row][self.col].get_opposite_color():
                             break
                 else:
-                    if self.color != board[self.row - 1][self.col].get_color():
+                    if self.color == board[self.row - 1][self.col].name == "nothing"():
                         moves.append((self.row - 1, self.col))
 
         return moves
@@ -440,11 +440,6 @@ def main(window):
 
             mouseRow, mouseCol = xy_to_rowcol(pygame.mouse.get_pos())
 
-            if event.type == pygame.MOUSEBUTTONDOWN and not moving:
-                cells[mouseRow][mouseCol].select(cells)
-                if board[mouseRow][mouseCol].name != "nothing":
-                    moving = True
-
             for row in range(8):
                 for col in range(8):
                     piece = board[row][col]
@@ -467,6 +462,11 @@ def main(window):
                                 # board = flip_board(board, cells)[0]
                                 # cells = flip_board(board, cells)[1]
                                 # flipped = True if flipped == False else False
+
+            if event.type == pygame.MOUSEBUTTONDOWN and not moving:
+                cells[mouseRow][mouseCol].select(cells)
+                if board[mouseRow][mouseCol].color == turn:
+                    moving = True
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_x:
