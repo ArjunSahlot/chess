@@ -33,7 +33,10 @@ ICON = pygame.image.load(os.path.join("assets", "icon.png"))
 
 '''Constants'''
 WIDTH = 800
+FPS = 30
+CLOCK = pygame.time.Clock()
 WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
+MOVES_SURF = pygame.Surface((WIDTH, WIDTH), pygame.SRCALPHA)
 pygame.display.set_caption("Chess, By: Arjun Sahlot")
 pygame.display.set_icon(ICON)
 
@@ -42,15 +45,15 @@ GREEN = (125, 147, 93)
 WHITE = (235, 235, 211)
 YELLOW = (245, 242, 148)
 YELLOWGREEN = (190, 200, 89)
-GREY = (170, 170, 170)
+GREY = (0, 0, 0, 50)
 
 
 class Cell:
     def __init__(self, row, col, color):
         self.row = row
         self.col = col
-        self.x = 100 * col
-        self.y = 100 * row
+        self.x = (WIDTH // 8) * col
+        self.y = (WIDTH // 8) * row
         self.color = color
         self.old_color = color
         self.selected = None
@@ -58,8 +61,8 @@ class Cell:
     def change_pos(self, row, col):
         self.row = row
         self.col = col
-        self.x = 100 * col
-        self.y = 100 * row
+        self.x = (WIDTH // 8) * col
+        self.y = (WIDTH // 8) * row
 
     def get_pos(self):
         return self.row, self.col
@@ -81,15 +84,15 @@ class Cell:
                 self.color = YELLOW
             elif self.color == GREEN:
                 self.color = YELLOWGREEN
-        window.fill(self.color, rect=(self.x, self.y, 100, 100))
+        window.fill(self.color, rect=(self.x, self.y, (WIDTH // 8), (WIDTH // 8)))
 
 
 class Piece:
     def __init__(self, row, col, image, name, color):
         self.row = row
         self.col = col
-        self.x = 100 * col
-        self.y = 100 * row
+        self.x = (WIDTH // 8) * col
+        self.y = (WIDTH // 8) * row
         self.image = image
         self.name = name
         self.color = color
@@ -97,8 +100,8 @@ class Piece:
     def change_pos(self, new_row, new_col):
         self.row = new_row
         self.col = new_col
-        self.x = 100 * self.col
-        self.y = 100 * self.row
+        self.x = (WIDTH // 8) * self.col
+        self.y = (WIDTH // 8) * self.row
 
     def get_pos(self):
         return self.row, self.col
@@ -117,14 +120,15 @@ class Piece:
 
     def draw(self, window):
         if self.image != "nothing":
-            window.blit(self.image, (self.x + (100 - self.image.get_width()
-                                               ) // 2, self.y + (100 - self.image.get_height()) // 2))
+            window.blit(self.image, (self.x + ((WIDTH // 8) - self.image.get_width()
+                                               ) // 2, self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
 
     def draw_moves(self, window, moves):
+        MOVES_SURF.fill((0, 0, 0, 0))
         for row, col in moves:
             x, y = rowcol_to_xy((row, col))
             pygame.draw.circle(
-                window, GREY, (x + 50, y + 50), 25)
+                MOVES_SURF, GREY, (x + 50, y + 50), 25)
 
     def __repr__(self):
         return self.name
@@ -213,67 +217,72 @@ class Piece:
         if self.name == "KING":
             if self.row != 0:
                 if self.col != 0:
-                    if self.color != board[self.row - 1][self.col - 1].get_color(): moves.append(
-                        (self.row - 1, self.col - 1))
-                if self.color != board[self.row - 1][self.col].get_color(): moves.append((self.row - 1, self.col))
+                    if self.color != board[self.row - 1][self.col - 1].get_color():
+                        moves.append((self.row - 1, self.col - 1))
+                if self.color != board[self.row - 1][self.col].get_color():
+                    moves.append((self.row - 1, self.col))
                 if self.col != 7:
-                    if self.color != board[self.row - 1][self.col + 1].get_color(): moves.append(
-                        (self.row - 1, self.col + 1))
+                    if self.color != board[self.row - 1][self.col + 1].get_color():
+                        moves.append((self.row - 1, self.col + 1))
+
             if self.col != 0:
-                if self.color != board[self.row][self.col - 1].get_color(): moves.append((self.row, self.col - 1))
+                if self.color != board[self.row][self.col - 1].get_color():
+                    moves.append((self.row, self.col - 1))
+
             if self.col != 7:
-                if self.color != board[self.row][self.col + 1].get_color(): moves.append((self.row, self.col + 1))
+                if self.color != board[self.row][self.col + 1].get_color():
+                    moves.append((self.row, self.col + 1))
+
             if self.row != 7:
                 if self.col != 0:
-                    if self.color != board[self.row + 1][self.col - 1].get_color(): moves.append(
-                        (self.row + 1, self.col - 1))
-                if self.color != board[self.row + 1][self.col].get_color(): moves.append((self.row + 1, self.col))
+                    if self.color != board[self.row + 1][self.col - 1].get_color():
+                        moves.append((self.row + 1, self.col - 1))
+                if self.color != board[self.row + 1][self.col].get_color():
+                    moves.append((self.row + 1, self.col))
                 if self.col != 7:
-                    if self.color != board[self.row + 1][self.col + 1].get_color(): moves.append(
-                        (self.row + 1, self.col + 1))
+                    if self.color != board[self.row + 1][self.col + 1].get_color():
+                        moves.append((self.row + 1, self.col + 1))
 
         # Knights
         if self.name == "KNIGHT":
             for row in board:
                 for spot in row:
-                    if (abs(spot.get_pos()[0] - self.row) == 2 and abs(spot.get_pos()[1] - self.col) == 1) or (abs(spot.get_pos()[0] - self.row) == 1 and abs(spot.get_pos()[1] - self.col) == 2) and spot.get_color() != self.color:
+                    if (abs(spot.get_pos()[0] - self.row) == 2 and abs(spot.get_pos()[1] - self.col) == 1) or \
+                            (abs(spot.get_pos()[0] - self.row) == 1 and abs(spot.get_pos()[1] - self.col) == 2) and \
+                            spot.get_color() != self.color:
                         moves.append(spot.get_pos())
 
         # Pawns
         if self.name == "PAWN":
             if pawncol == "BLACK":
                 if self.col != 0:
-                    if self.color == board[self.row - 1][self.col - 1].get_opposite_color(): moves.append(
-                        (self.row - 1, self.col - 1))
+                    if self.color == board[self.row - 1][self.col - 1].get_opposite_color():
+                        moves.append((self.row - 1, self.col - 1))
                 if self.col != 7:
-                    if self.color == board[self.row - 1][self.col + 1].get_opposite_color(): moves.append(
-                        (self.row - 1, self.col + 1))
+                    if self.color == board[self.row - 1][self.col + 1].get_opposite_color():
+                        moves.append((self.row - 1, self.col + 1))
                 if self.row == 1:
                     for row in range(self.row + 1, self.row + 3):
-                        if self.color == board[row][self.col].get_color():
+                        if board[row][self.col].name != "nothing":
                             break
                         moves.append((row, self.col))
-                        if self.color == board[row][self.col].get_opposite_color():
-                            break
                 else:
-                    if self.color == board[self.row + 1][self.col].name == "nothing"():
+                    if board[self.row + 1][self.col].name == "nothing":
                         moves.append((self.row + 1, self.col))
             else:
                 if self.col != 0:
-                    if self.color == board[self.row - 1][self.col - 1].get_opposite_color(): moves.append(
-                        (self.row - 1, self.col - 1))
+                    if self.color == board[self.row - 1][self.col - 1].get_opposite_color():
+                        moves.append((self.row - 1, self.col - 1))
                 if self.col != 7:
-                    if self.color == board[self.row - 1][self.col + 1].get_opposite_color(): moves.append(
-                        (self.row - 1, self.col + 1))
+                    if self.color == board[self.row - 1][self.col + 1].get_opposite_color():
+                        moves.append((self.row - 1, self.col + 1))
                 if self.row == 6:
                     for row in range(self.row - 1, self.row - 3, -1):
-                        if self.color == board[row][self.col].get_color():
+                        if board[row][self.col].name != "nothing":
                             break
                         moves.append((row, self.col))
-                        if self.color == board[row][self.col].get_opposite_color():
-                            break
                 else:
-                    if self.color == board[self.row - 1][self.col].name == "nothing"():
+                    if board[self.row - 1][self.col].name == "nothing":
                         moves.append((self.row - 1, self.col))
 
         return moves
@@ -365,13 +374,18 @@ def king_in_check(board, color, flipped):
 
 
 def refine_moves(board, moves, piece, flipped):
+    rem = []
+
     for pos in moves:
         tmpboard = copy(board)
         tmpboard[piece.get_pos()[0]][piece.get_pos()[1]] = Piece(
             piece.get_pos()[0], piece.get_pos()[1], "nothing", "nothing", "nothing")
         tmpboard[pos[0]][pos[1]] = piece
         if king_in_check(tmpboard, piece.color, flipped):
-            moves.remove(pos)
+            rem.append(pos)
+
+    for r in rem:
+        moves.remove(r)
 
     return moves
 
@@ -403,12 +417,12 @@ def make_cells():
 
 def xy_to_rowcol(xy):
     x, y = xy
-    return y // 100, x // 100
+    return y // (WIDTH // 8), x // (WIDTH // 8)
 
 
 def rowcol_to_xy(rowcol):
     row, col = rowcol
-    return col * 100, row * 100
+    return col * (WIDTH // 8), row * (WIDTH // 8)
 
 
 def draw_cells(window, cells):
@@ -417,12 +431,18 @@ def draw_cells(window, cells):
             cell.draw(window)
 
 
+def reset_moves_surf():
+    MOVES_SURF.fill((0, 0, 0, 0))
+
+
 def draw_window(window, board, cells):
     draw_cells(window, cells)
 
     for row in board:
         for piece in row:
             piece.draw(window)
+
+    window.blit(MOVES_SURF, (0, 0))
 
 
 def main(window):
@@ -433,6 +453,7 @@ def main(window):
     flipped = False
     turn = "WHITE"
     while run:
+        # CLOCK.tick(FPS)
         draw_window(window, board, cells)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -445,13 +466,14 @@ def main(window):
                     piece = board[row][col]
                     cell = cells[row][col]
                     if cell.selected and turn == piece.get_color():
-                        piece.draw_moves(window, refine_moves(
-                            board, piece.possible_moves(board, flipped), piece, flipped))
+                        piece_moves = refine_moves(board, piece.possible_moves(board, flipped), piece, flipped)
+                        piece.draw_moves(window, piece_moves)
                         if event.type == pygame.MOUSEBUTTONDOWN and moving:
                             moving = False
                             mouseRow, mouseCol = xy_to_rowcol(
                                 pygame.mouse.get_pos())
-                            if (mouseRow, mouseCol) in refine_moves(board, piece.possible_moves(board, flipped), piece, flipped):
+                            reset_moves_surf()
+                            if (mouseRow, mouseCol) in piece_moves:
                                 board[mouseRow][mouseCol] = piece
                                 board[row][col] = Piece(
                                     row, col, "nothing", "nothing", "nothing")
