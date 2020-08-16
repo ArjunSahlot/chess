@@ -115,13 +115,10 @@ class Piece:
         elif self.color == "BLACK":
             return "WHITE"
 
-    def get_name(self):
-        return self.name
-
     def draw(self, window):
         if self.image != "nothing":
-            window.blit(self.image, (self.x + ((WIDTH // 8) - self.image.get_width()
-                                               ) // 2, self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
+            window.blit(self.image, (self.x +
+                ((WIDTH // 8) - self.image.get_width()) // 2, self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
 
     def draw_moves(self, window, moves):
         MOVES_SURF.fill((0, 0, 0, 0))
@@ -142,28 +139,28 @@ class Piece:
         if self.name == "ROOK" or self.name == "QUEEN":
             # Down
             for row in range(self.row + 1, 8):
-                if self.color == board[row][self.col].get_color():
+                if self.color == board[row][self.col].color:
                     break
                 moves.append((row, self.col))
                 if self.color == board[row][self.col].get_opposite_color():
                     break
             # Up
             for row in range(self.row - 1, -1, -1):
-                if self.color == board[row][self.col].get_color():
+                if self.color == board[row][self.col].color:
                     break
                 moves.append((row, self.col))
                 if self.color == board[row][self.col].get_opposite_color():
                     break
             # Right
             for col in range(self.col + 1, 8):
-                if self.color == board[self.row][col].get_color():
+                if self.color == board[self.row][col].color:
                     break
                 moves.append((self.row, col))
                 if self.color == board[self.row][col].get_opposite_color():
                     break
             # Left
             for col in range(self.col - 1, -1, -1):
-                if self.color == board[self.row][col].get_color():
+                if self.color == board[self.row][col].color:
                     break
                 moves.append((self.row, col))
                 if self.color == board[self.row][col].get_opposite_color():
@@ -173,7 +170,7 @@ class Piece:
         if self.name == "BISHOP" or self.name == "QUEEN":
             for row in range(self.row + 1, 8):
                 try:
-                    if self.color == board[row][self.col + (row - self.row)].get_color():
+                    if self.color == board[row][self.col + (row - self.row)].color:
                         break
                     moves.append((row, self.col + (row - self.row)))
                     if self.color == board[row][self.col + (row - self.row)].get_opposite_color():
@@ -183,7 +180,7 @@ class Piece:
 
             for row in range(self.row - 1, -1, -1):
                 try:
-                    if self.color == board[row][self.col + (row - self.row)].get_color():
+                    if self.color == board[row][self.col + (row - self.row)].color:
                         break
                     moves.append((row, self.col + (row - self.row)))
                     if self.color == board[row][self.col + (row - self.row)].get_opposite_color():
@@ -193,7 +190,7 @@ class Piece:
 
             for row in range(self.row + 1, 8):
                 try:
-                    if self.color == board[row][self.col - (row - self.row)].get_color():
+                    if self.color == board[row][self.col - (row - self.row)].color:
                         break
                     moves.append((row, self.col - (row - self.row)))
                     if self.color == board[row][self.col - (row - self.row)].get_opposite_color():
@@ -203,7 +200,7 @@ class Piece:
 
             for row in range(self.row - 1, -1, -1):
                 try:
-                    if self.color == board[row][self.col - (row - self.row)].get_color():
+                    if self.color == board[row][self.col - (row - self.row)].color:
                         break
                     moves.append((row, self.col - (row - self.row)))
                     if self.color == board[row][self.col - (row - self.row)].get_opposite_color():
@@ -217,30 +214,30 @@ class Piece:
         if self.name == "KING":
             if self.row != 0:
                 if self.col != 0:
-                    if self.color != board[self.row - 1][self.col - 1].get_color():
+                    if self.color != board[self.row - 1][self.col - 1].color:
                         moves.append((self.row - 1, self.col - 1))
-                if self.color != board[self.row - 1][self.col].get_color():
+                if self.color != board[self.row - 1][self.col].color:
                     moves.append((self.row - 1, self.col))
                 if self.col != 7:
-                    if self.color != board[self.row - 1][self.col + 1].get_color():
+                    if self.color != board[self.row - 1][self.col + 1].color:
                         moves.append((self.row - 1, self.col + 1))
 
             if self.col != 0:
-                if self.color != board[self.row][self.col - 1].get_color():
+                if self.color != board[self.row][self.col - 1].color:
                     moves.append((self.row, self.col - 1))
 
             if self.col != 7:
-                if self.color != board[self.row][self.col + 1].get_color():
+                if self.color != board[self.row][self.col + 1].color:
                     moves.append((self.row, self.col + 1))
 
             if self.row != 7:
                 if self.col != 0:
-                    if self.color != board[self.row + 1][self.col - 1].get_color():
+                    if self.color != board[self.row + 1][self.col - 1].color:
                         moves.append((self.row + 1, self.col - 1))
-                if self.color != board[self.row + 1][self.col].get_color():
+                if self.color != board[self.row + 1][self.col].color:
                     moves.append((self.row + 1, self.col))
                 if self.col != 7:
-                    if self.color != board[self.row + 1][self.col + 1].get_color():
+                    if self.color != board[self.row + 1][self.col + 1].color:
                         moves.append((self.row + 1, self.col + 1))
 
         # Knights
@@ -249,18 +246,18 @@ class Piece:
                 for spot in row:
                     if (abs(spot.get_pos()[0] - self.row) == 2 and abs(spot.get_pos()[1] - self.col) == 1) or \
                             (abs(spot.get_pos()[0] - self.row) == 1 and abs(spot.get_pos()[1] - self.col) == 2) and \
-                            spot.get_color() != self.color:
+                            spot.color != self.color:
                         moves.append(spot.get_pos())
 
         # Pawns
         if self.name == "PAWN":
             if pawncol == "BLACK":
                 if self.col != 0:
-                    if self.color == board[self.row - 1][self.col - 1].get_opposite_color():
-                        moves.append((self.row - 1, self.col - 1))
+                    if self.color == board[self.row + 1][self.col - 1].get_opposite_color():
+                        moves.append((self.row + 1, self.col - 1))
                 if self.col != 7:
-                    if self.color == board[self.row - 1][self.col + 1].get_opposite_color():
-                        moves.append((self.row - 1, self.col + 1))
+                    if self.color == board[self.row + 1][self.col + 1].get_opposite_color():
+                        moves.append((self.row + 1, self.col + 1))
                 if self.row == 1:
                     for row in range(self.row + 1, self.row + 3):
                         if board[row][self.col].name != "nothing":
@@ -378,8 +375,8 @@ def refine_moves(board, moves, piece, flipped):
 
     for pos in moves:
         tmpboard = copy(board)
-        tmpboard[piece.get_pos()[0]][piece.get_pos()[1]] = Piece(
-            piece.get_pos()[0], piece.get_pos()[1], "nothing", "nothing", "nothing")
+        tmpboard[piece.row][piece.col] = Piece(
+            piece.row, piece.col, "nothing", "nothing", "nothing")
         tmpboard[pos[0]][pos[1]] = piece
         if king_in_check(tmpboard, piece.color, flipped):
             rem.append(pos)
@@ -465,7 +462,7 @@ def main(window):
                 for col in range(8):
                     piece = board[row][col]
                     cell = cells[row][col]
-                    if cell.selected and turn == piece.get_color():
+                    if cell.selected and turn == piece.color:
                         piece_moves = refine_moves(board, piece.possible_moves(board, flipped), piece, flipped)
                         piece.draw_moves(window, piece_moves)
                         if event.type == pygame.MOUSEBUTTONDOWN and moving:
