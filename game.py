@@ -118,7 +118,8 @@ class Piece:
     def draw(self, window):
         if self.image != "nothing":
             window.blit(self.image, (self.x +
-                ((WIDTH // 8) - self.image.get_width()) // 2, self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
+                                     ((WIDTH // 8) - self.image.get_width()) // 2,
+                                     self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
 
     def draw_moves(self, window, moves):
         MOVES_SURF.fill((0, 0, 0, 0))
