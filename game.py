@@ -121,7 +121,7 @@ class Piece:
                                      ((WIDTH // 8) - self.image.get_width()) // 2,
                                      self.y + ((WIDTH // 8) - self.image.get_height()) // 2))
 
-    def draw_moves(self, window, moves):
+    def draw_moves(self, moves):
         MOVES_SURF.fill((0, 0, 0, 0))
         for row, col in moves:
             x, y = rowcol_to_xy((row, col))
