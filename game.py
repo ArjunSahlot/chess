@@ -465,7 +465,7 @@ def main(window):
                     cell = cells[row][col]
                     if cell.selected and turn == piece.color:
                         piece_moves = refine_moves(board, piece.possible_moves(board, flipped), piece, flipped)
-                        piece.draw_moves(window, piece_moves)
+                        piece.draw_moves(piece_moves)
                         if event.type == pygame.MOUSEBUTTONDOWN and moving:
                             moving = False
                             mouseRow, mouseCol = xy_to_rowcol(
