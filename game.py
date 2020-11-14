@@ -37,7 +37,7 @@ FPS = 30
 CLOCK = pygame.time.Clock()
 WINDOW = pygame.display.set_mode((WIDTH, WIDTH))
 MOVES_SURF = pygame.Surface((WIDTH, WIDTH), pygame.SRCALPHA)
-pygame.display.set_caption("Chess, By: Arjun Sahlot")
+pygame.display.set_caption("Chess")
 pygame.display.set_icon(ICON)
 
 '''Colors'''
